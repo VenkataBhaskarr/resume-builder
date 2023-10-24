@@ -1,0 +1,18 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.custom{
+    height: 40px;
+    width: 44px;
+}
+
+.custom2{
+    height: 750px;
+    width: 700px;
+}
+@media print {
+    button {
+        display: none;
+    }
+}
