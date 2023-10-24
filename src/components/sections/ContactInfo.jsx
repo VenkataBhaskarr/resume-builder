@@ -11,9 +11,9 @@ export const ContactInfo = () => {
 
     return (
         <div className="text-center">
-            <h1>{config.contactInfo.name}</h1>
+            <h1 className={"text-4xl"}>{config.contactInfo.name}</h1>
 
-            <h2>{config.contactInfo.title}</h2>
+            <h2 className={"text-2xl"}>{config.contactInfo.title}</h2>
 
             <a href={`mailto:${config.contactInfo.email}`}>{config.contactInfo.email}</a>
 

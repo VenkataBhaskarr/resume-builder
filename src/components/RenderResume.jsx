@@ -4,10 +4,10 @@ import {Summary} from "./sections/Summary.jsx";
 import {WorkExperience} from "./sections/WorkExperience.jsx";
 import {Education} from "./sections/Education.jsx";
 import {Skills} from "./sections/Skills.jsx";
-
+import SectionWrapper from "./shared/SectionWrapper.jsx"
 function RenderResume() {
     const download = () => {
-        window.print()
+        window.print();
     }
 
     useEffect(() => {
@@ -20,7 +20,9 @@ function RenderResume() {
 
             <Summary />
 
-            <WorkExperience />
+            <SectionWrapper title={"Work Experience"}>
+                <WorkExperience />
+            </SectionWrapper>
 
             <Education />
 

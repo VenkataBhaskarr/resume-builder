@@ -1,6 +1,6 @@
 import {configState} from "../hooks/config.js";
 import {useRecoilValue} from "recoil";
-import { SectionWrapper } from '../shared';
+import SectionWrapper from '../shared/SectionWrapper.jsx';
 
 export const Summary = () => {
     const config = useRecoilValue(configState);

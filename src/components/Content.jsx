@@ -5,10 +5,25 @@ import {useNavigate} from "react-router-dom";
 function Content() {
     const navigate = useNavigate()
     const [config, setConfig] = useRecoilState(configState);
-    const renderResume = () => {
+    const renderresume = () => {
+        console.log(config)
         navigate("/renderresume")
     }
-
+    function handleAddWorkExperience() {
+        const prevConfig = {...config}
+        prevConfig.workExperience = [...prevConfig.workExperience, {}]
+        setConfig(prevConfig)
+    }
+    function handleAddSkills(){
+        const prevConfig = {...config}
+        prevConfig.skills = [...prevConfig.skills, '']
+        setConfig(prevConfig)
+    }
+    function handleAddEducation(){
+        const prevConfig = {...config}
+        prevConfig.education = [...prevConfig.education, {}]
+        setConfig(prevConfig)
+    }
     const handleInputChange = (section, value, thing) => {
         setConfig((prevConfig) => ({
             ...prevConfig,
@@ -16,31 +31,49 @@ function Content() {
         }));
     }
 
-    const handleWorkChange = (e, index) => {
-        const updatedWorkExperience = [...config.workExperience];
-        updatedWorkExperience[index] = {
-            ...updatedWorkExperience[index],
-            [e.target.name]: e.target.value,
-        };
-        handleInputChange('workExperience', index, updatedWorkExperience);
+    const handleWorkChange = (index,source,target,mainHeader) => {
+        setConfig(prevConfig => {
+            return {
+                ...prevConfig,
+                [mainHeader]: [
+                    ...prevConfig[mainHeader].slice(0, index),
+                    {
+                        ...prevConfig[mainHeader][index],
+                        [target]: source,
+                    },
+                    ...prevConfig[mainHeader].slice(index + 1),
+                ],
+            };
+        });
     }
 
-    const removeWorkExperience = (index) => {
-        const updatedWorkExperience = [...config.workExperience];
-        updatedWorkExperience.splice(index, 1);
-        handleInputChange('workExperience', updatedWorkExperience);
+    const removeAttribute = (index, target) => {
+        const prevConfig = {...config}
+        prevConfig[target] = [...prevConfig[target]]
+        prevConfig[target].splice(index,1)
+        setConfig(prevConfig)
+
+    }
+    function handleSkillAddition(index, value) {
+        setConfig((prevConfig) => {
+            const updatedSkills = [...prevConfig.skills];
+            if (index < updatedSkills.length) {
+                updatedSkills[index] = value;
+            } else {
+                updatedSkills.push(value);
+            }
+
+            return {
+                ...prevConfig,
+                skills: updatedSkills,
+            };
+        });
     }
 
-    const removeEducation = (index) => {
-        const updatedEducation = [...config.education];
-        updatedEducation.splice(index, 1);
-        handleInputChange('education', updatedEducation);
-    }
-
-    const removeSkill = (index) => {
-        const updatedSkills = [...config.skills];
-        updatedSkills.splice(index, 1);
-        handleInputChange('skills', updatedSkills);
+    function handleSummarySection(source) {
+        const prevConfig = {...config}
+        prevConfig.summary = source
+        setConfig(prevConfig)
     }
 
     return (
@@ -98,7 +131,7 @@ function Content() {
                 name="summary"
                 placeholder="Summary"
                 value={config.summary}
-                onChange={(e) => handleInputChange('summary', e.target.value)}
+                onChange={(e) => handleSummarySection(e.target.value)}
                 className="w-full p-2 mb-2 rounded border border-gray-300"
             ></textarea>
 
@@ -109,10 +142,11 @@ function Content() {
                     <div className="mb-2">
                         <input
                             type="text"
-                            name="workTitle"
                             placeholder="Job Title"
-                            value={exp.workTitle || ''}
-                            onChange={(e) => handleWorkChange(e, index)}
+                            name="title"
+                            value={exp["title"] || ''}
+                            // index,source,target,mainHeader
+                            onChange={(e) => handleWorkChange(index,e.target.value,"title", "workExperience")}
                             className="w-full p-2 rounded border border-gray-300"
                         />
                     </div>
@@ -121,8 +155,8 @@ function Content() {
                             type="text"
                             name="company"
                             placeholder="Company"
-                            value={exp.company || ''}
-                            onChange={(e) => handleWorkChange(e, index)}
+                            value={exp["company"] || ''}
+                            onChange={(e) => handleWorkChange(index,e.target.value,"company","workExperience")}
                             className="w-full p-2 rounded border border-gray-300"
                         />
                     </div>
@@ -131,8 +165,8 @@ function Content() {
                             type="text"
                             name="location"
                             placeholder="Location"
-                            value={exp.location || ''}
-                            onChange={(e) => handleWorkChange(e, index)}
+                            value={exp["location"] || ''}
+                            onChange={(e) => handleWorkChange(index,e.target.value,"location","workExperience")}
                             className="w-full p-2 rounded border border-gray-300"
                         />
                     </div>
@@ -141,8 +175,8 @@ function Content() {
                             type="text"
                             name="date"
                             placeholder="Date"
-                            value={exp.date || ''}
-                            onChange={(e) => handleWorkChange(e, index)}
+                            value={exp["date"] || ''}
+                            onChange={(e) => handleWorkChange(index,e.target.value,"date","workExperience")}
                             className="w-full p-2 rounded border border-gray-300"
                         />
                     </div>
@@ -151,14 +185,14 @@ function Content() {
           name="description"
           placeholder="Description"
           value={exp.description || ''}
-          onChange={(e) => handleWorkChange(e, index)}
+          onChange={(e) => handleWorkChange(index,e.target.value,"description","workExperience")}
           className="w-full p-2 rounded border border-gray-300"
       ></textarea>
                     </div>
                     {/* Button to remove this work experience entry */}
                     <button
                         className="text-red-500 hover:text-red-600"
-                        onClick={() => removeWorkExperience(index)}
+                        onClick={() => removeAttribute(index, "workExperience")}
                     >
                         Remove
                     </button>
@@ -168,40 +202,76 @@ function Content() {
             <button
                 className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
                 onClick={() => {
-                    handleInputChange('workExperience', [...config.workExperience, {}]);
+                    handleAddWorkExperience();
                 }}
             >
                 Add Work Experience
             </button>
+                {/*EDU SECTION STARTS*/}
 
-            {/* Education Section */}
             <h2 className="text-xl font-semibold my-2">Education</h2>
             {config.education.map((edu, index) => (
                 <div key={index} className="mb-4">
-          <textarea
-              name="education"
-              placeholder="Education"
-              value={edu}
-              onChange={(e) => {
-                  const updatedEducation = [...config.education];
-                  updatedEducation[index] = e.target.value;
-                  handleInputChange('education', updatedEducation);
-              }}
-              className="w-full p-2 mb-2 rounded border border-gray-300"
-          ></textarea>
+    <textarea
+        name="school"
+        placeholder="School"
+        value={edu.school}
+        onChange={(e) => {
+            handleWorkChange(index, e.target.value, "school", "education");
+        }}
+        className="w-full p-2 mb-2 rounded border border-gray-300"
+    ></textarea>
+                    <textarea
+                        name="location"
+                        placeholder="Location"
+                        value={edu.location}
+                        onChange={(e) => {
+                            handleWorkChange(index,e.target.value, "location" , "education");
+                        }}
+                        className="w-full p-2 mb-2 rounded border border-gray-300"
+                    ></textarea>
+                    <input
+                        name="date"
+                        placeholder="Date"
+                        type="text"
+                        value={edu.date}
+                        onChange={(e) => {
+                            handleWorkChange(index,e.target.value, "date", "education");
+                        }}
+                        className="w-full p-2 mb-2 rounded border border-gray-300"
+                    />
+                    <textarea
+                        name="degree"
+                        placeholder="Degree"
+                        value={edu.degree}
+                        onChange={(e) => {
+                            handleWorkChange(index, e.target.value, "degree", "education");
+                        }}
+                        className="w-full p-2 mb-2 rounded border border-gray-300"
+                    ></textarea>
+                    <textarea
+                        name="major"
+                        placeholder="Major"
+                        value={edu.major}
+                        onChange={(e) => {
+                            handleInputChange(index, e.target.value, "major", "education");
+                        }}
+                        className="w-full p-2 mb-2 rounded border border-gray-300"
+                    ></textarea>
                     <button
-                        className="text-red-500 hover:text-red-600"
-                        onClick={() => removeEducation(index)}
+                        className="text-red-500 hover-text-red-600"
+                        onClick={() => removeAttribute(index, "education")}
                     >
                         Remove
                     </button>
                 </div>
             ))}
+
             {/* Button to add more education entries */}
             <button
                 className="bg-blue-500 text-white px-4 py-2 rounded hover-bg-blue-600"
                 onClick={() => {
-                    handleInputChange('education', [...config.education, '']);
+                    handleAddEducation()
                 }}
             >
                 Add Education
@@ -212,28 +282,18 @@ function Content() {
             {config.skills.map((skill, index) => (
                 <div key={index} className="mb-4">
 
-                {/*    setConfig((prevConfig) => ({*/}
-                {/*    ...prevConfig,*/}
-                {/*    [section]: {*/}
-                {/*    ...prevConfig[section],*/}
-                {/*    [field]: value,*/}
-                {/*},*/}
-                {/*}));*/}
-
           <textarea
               name="skills"
               placeholder="Skills"
               value={skill}
               onChange={(e) => {
-                  const updatedSkills = [...config.skills];
-                  updatedSkills[index] = e.target.value;
-                  handleInputChange('skills', updatedSkills);
+                  handleSkillAddition(index, e.target.value)
               }}
               className="w-full p-2 mb-2 rounded border border-gray-300"
           ></textarea>
                     <button
                         className="text-red-500 hover:text-red-600"
-                        onClick={() => removeSkill(index)}
+                        onClick={() => removeAttribute(index, "skills")}
                     >
                         Remove
                     </button>
@@ -243,19 +303,20 @@ function Content() {
             <button
                 className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
                 onClick={() => {
-                    handleInputChange('skills', [...config.skills, '']);
+                    handleAddSkills()
                 }}
             >
                 Add Skill
             </button>
-            <div className={"mt-16"}>
-                <button
-                    className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded shadow-md"
-                    onClick={renderResume}
-                >
-                    Render Resume
-                </button>
-            </div>
+
+           <div className={"mt-16"}>
+               <button
+                   className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded shadow-md"
+                   onClick={renderresume}
+               >
+                   Render Resume
+               </button>
+           </div>
         </div>
     );
 }
